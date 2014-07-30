@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>Pre-test</title>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="./cld.css" />
+<script src="./tz.json"></script>
+<script src="./cld.js"></script>
+<script>
+var controller;
+var init = function(){
+    var conf = {
+        key: "city",
+        dataObj: tz,
+        submitCallback: {
+            lock:   function () { document.getElementById("Submit").disabled = true;  },
+            unLock: function () { document.getElementById("Submit").disabled = false; },
+        },
+    }
+    controller = CLD.AutoComplete(document.getElementById("PRE_TEST"), conf);
+};
+
+
+window.addEventListener("load", init, true);
+</script>
+<br/>
+<br/>
+<br/>
+<input id="PRE_TEST"><input id="Submit" type="button" value="Submit">
+<br/>
+<br/>

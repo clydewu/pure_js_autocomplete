@@ -1,0 +1,343 @@
+<html>
+<head>
+    <title>Pre-test</title>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="./cld.css" />
+<link rel="stylesheet" href="./qunit-1.14.0.css">
+<script src="./qunit-1.14.0.js"></script>
+<script src="./tz.json"></script>
+<script src="./cld.js"></script>
+<script>
+var init = function(){
+    var conf = {
+        key: "city",
+        dataObj: tz,
+        submitCallback: {
+            lock:   function () { document.getElementById("Submit").disabled = true;  },
+            unLock: function () { document.getElementById("Submit").disabled = false; },
+        },
+    }
+    var ctl1, ctl2; 
+
+    QUnit.module( "AutoComplete", {
+        setup: function( assert ) {
+            ctl1 = CLD.AutoComplete(document.getElementById("PRE_TEST"), conf);
+        }, teardown: function( assert ) {
+            ctl1.destroyer();
+            document.getElementById("PRE_TEST").value = "";
+        }
+    });
+
+    QUnit.test("Widget method: query()", function (assert){
+        expect(6);
+        stop();
+        ctl1.query("A");
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            start();
+            ctl1.query("Ar");
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 15);
+            start();
+            ctl1.query("Arg");
+        }, 2000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 13);
+            start();
+            var event = document.createEvent("MouseEvents");
+            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                document.getElementsByClassName("CLD_AC_PromptItem")[0]);
+            document.getElementsByClassName("CLD_AC_PromptItem")[0].dispatchEvent(event);
+            ctl1.query("");
+        }, 3000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptBox")[0].style.display, "none");
+            start();
+            var event = document.createEvent("MouseEvents");
+            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1]);
+            document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1].dispatchEvent(event);
+        }, 4000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 0);
+            start();
+        }, 5000);
+    });
+
+    QUnit.test("Widgt method: moveItem, positive num", function (assert){
+        expect(5);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
+            start();
+            ctl1.moveItem(1);
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[1].className.indexOf("HightLight") >= 0);
+            start();
+        }, 2000);
+
+    });
+
+    QUnit.test("Widgt method: moveItem(), positive num and overflow", function (assert){
+        expect(3);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
+            start();
+            ctl1.moveItem(document.getElementsByClassName("CLD_AC_PromptItem").length - 1);
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[document.getElementsByClassName("CLD_AC_PromptItem").length - 1].className.indexOf("HightLight") >= 0);
+            start();
+        }, 2000);
+
+    });
+        
+    QUnit.test("Widgt method: moveItem(), negative num and overflow", function (assert){
+        expect(3);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
+            start();
+            ctl1.moveItem(-2);
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[document.getElementsByClassName("CLD_AC_PromptItem").length - 2].className.indexOf("HightLight") >= 0);
+            start();
+        }, 2000);
+    });
+
+    QUnit.test("Widgt method: moveItem(), number over length", function (assert){
+        expect(3);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
+            start();
+            ctl1.moveItem(document.getElementsByClassName("CLD_AC_PromptItem").length * 2 + 2);
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
+            assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[2].className.indexOf("HightLight") >= 0);
+            start();
+        }, 2000);
+    });
+
+    QUnit.test("Widget method: checkItem()", function (assert){
+        expect(3);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(0);
+            ctl1.query("B");
+        }, 1000);
+
+        setTimeout(function() {
+            ctl1.checkItem(0);
+        }, 2000);
+
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 2);
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Abidjan");
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[1].childNodes[0].data, "Bamako");
+            start();
+        }, 3000);
+    });
+
+    QUnit.test("Widget method: unCheckItem()", function (assert){
+        expect(3);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(0);
+            ctl1.query("B");
+        }, 1000);
+
+        setTimeout(function() {
+            ctl1.checkItem(0);
+        }, 2000);
+
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 2);
+            start();
+        }, 3000);
+
+        stop();
+        setTimeout(function() {
+            ctl1.unCheckItem(0);
+        }, 4000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Bamako");
+            start();
+        }, 5000);
+    });
+
+    QUnit.test("Widget method: getCheckedItems()", function (assert){
+        expect(5);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(0);
+            ctl1.query("B");
+        }, 1000);
+
+        setTimeout(function() {
+            ctl1.checkItem(0);
+        }, 2000);
+
+        setTimeout(function() {
+            var result = ctl1.getCheckedItems();
+            assert.equal(result.length, 2);
+            assert.equal(result[0].city, "Abidjan");
+            assert.equal(result[1].city, "Bamako");
+            start();
+        }, 3000);
+
+        stop();
+        setTimeout(function() {
+            ctl1.unCheckItem(0);
+        }, 4000);
+        setTimeout(function() {
+            var result = ctl1.getCheckedItems();
+            assert.equal(result.length, 1);
+            assert.equal(result[0].city, "Bamako");
+            start();
+        }, 5000);
+    });
+
+    QUnit.test("Widget method: getCheckedString()", function (assert){
+        expect(2);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(0);
+        }, 1000);
+
+        setTimeout(function() {
+            ctl1.query("B");
+        }, 2000);
+
+        setTimeout(function() {
+            ctl1.checkItem(0);
+        }, 3000);
+
+        setTimeout(function() {
+            assert.equal(ctl1.getCheckedString(), "Abidjan,Bamako");
+            start();
+        }, 5000);
+
+        stop();
+        setTimeout(function() {
+            ctl1.unCheckItem(0);
+        }, 6000);
+        setTimeout(function() {
+            assert.equal(ctl1.getCheckedString(), "Bamako");
+            start();
+        }, 7000);
+    });
+
+    QUnit.test("Widget method: reConfigure()", function (assert){
+        expect(2);
+        ctl1.query("a");
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            start();
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            ctl1.reConfigure({caseSensitive: true});
+            ctl1.query("a");
+        }, 2000);
+
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 0);
+            start();
+        }, 3000);
+    });
+
+    QUnit.test("Widget method: destroyer()", function (assert){
+        expect(5);
+        ctl1.destroyer();
+        assert.equal(document.getElementsByClassName("CLD_AC_FrameBox").length, 0);
+        assert.equal(document.getElementsByClassName("CLD_AC_CheckedBox").length, 0);
+        assert.equal(document.getElementsByClassName("CLD_AC_InputBox").length, 0);
+        assert.equal(document.getElementsByClassName("CLD_AC_PromptBox").length, 0);
+        var ctx1 = CLD.AutoComplete(document.getElementById("PRE_TEST"), conf);
+        assert.notDeepEqual(ctl1, ctx1);
+        ctl1 = ctx1;
+    });
+
+    QUnit.module( "Multiple entries", {
+        setup: function( assert ) {
+            ctl1 = CLD.AutoComplete(document.getElementById("PRE_TEST"), conf);
+            ctl2 = CLD.AutoComplete(document.getElementById("PRE_TEST2"), conf);
+        }, teardown: function( assert ) {
+            ctl1.destroyer();
+            ctl2.destroyer();
+            document.getElementById("PRE_TEST").value = "";
+            document.getElementById("PRE_TEST2").value = "";
+        }
+    });
+    QUnit.test("Check context", function (assert){
+        expect(3);
+        var ctx1 = CLD.findWidget(document.getElementById("PRE_TEST"), "AutoComplete")
+        var ctx2 = CLD.findWidget(document.getElementById("PRE_TEST2"), "AutoComplete")
+        assert.notDeepEqual(ctx1, ctx2);
+        assert.deepEqual(ctl1, ctx1);
+        assert.deepEqual(ctl2, ctx2);
+    });
+
+
+};
+
+
+window.addEventListener("load", init, true);
+</script>
+<br/>
+<br/>
+<br/>
+<input id="PRE_TEST"><input id="Submit" type="button" value="Submit">
+<br/>
+<br/>
+<input id="PRE_TEST2">
+<div id="qunit"></div>

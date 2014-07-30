@@ -1,0 +1,67 @@
+.CLD_AC_FrameBox {
+    position: relative;
+    border-radius: 5px;
+    border-top: 2px solid #CAC8C7;
+    border-left: 2px solid #CAC8C7;
+    border-bottom: 2px solid #F0EFEF;
+    border-right: 2px solid #F0EFEF;
+    padding: 5px 5px;
+    margin: 5px;
+}
+
+.CLD_AC_InputBox {
+    border: 0px solid white;
+}
+
+.CLD_AC_PromptBox {
+    background-color: white;
+    border: 1px solid black;
+    position: absolute;
+    overflow-y: scroll;
+    max-height: 200px;
+    min-width: 150px;
+    top: 33px;
+}
+
+.CLD_AC_PromptItem {
+}
+
+.CLD_AC_PromptItem.HightLight {
+    background-color: #444444;
+    color: White;
+}
+
+.CLD_AC_Checked {
+    padding: 0 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #444444;
+    color: White;
+    margin: 0px 5px;
+    vertical-align: middle;
+}
+
+.CLD_AC_Checked a{
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    background-image: url("./x.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: xx-small;
+    vertical-align: middle;
+}
+
+.CLD_AC_Checked a:visited{
+    border-top: 1px solid White;
+    border-left: 1px solid White;
+    border-bottom: 1px solid Black;
+    border-right: 1px solid Black;
+}
+
+.CLD_AC_Checked a:hover{
+    border-top: 1px solid Black;
+    border-left: 1px solid Black;
+    border-bottom: 1px solid White;
+    border-right: 1px solid White;
+}
