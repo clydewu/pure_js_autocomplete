@@ -29,71 +29,98 @@ var init = function(){
         }
     });
 
-    QUnit.test("Widget method: query()", function (assert){
+    QUnit.test("Widget method: query(), normal operation", function (assert){
         expect(6);
         stop();
         ctl1.query("A");
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Abidjan");
             start();
             ctl1.query("Ar");
+        }, 500);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Araguaina");
+            start();
+            ctl1.query("Arg");
         }, 1000);
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 15);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Argentina/Buenos_Aires");
             start();
-            ctl1.query("Arg");
-        }, 2000);
+        }, 1500);
+    });
+
+    QUnit.test("Widget method: query(), clear current input", function (assert){
+        expect(5);
+        stop();
+        ctl1.query("A");
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Abidjan");
+            assert.equal(document.getElementById("Submit").disabled, true);
+            start();
+        }, 500);
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 13);
-            start();
-            var event = document.createEvent("MouseEvents");
-            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                document.getElementsByClassName("CLD_AC_PromptItem")[0]);
-            document.getElementsByClassName("CLD_AC_PromptItem")[0].dispatchEvent(event);
             ctl1.query("");
-        }, 3000);
+        }, 1000);
 
-        stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
             assert.equal(document.getElementsByClassName("CLD_AC_PromptBox")[0].style.display, "none");
+            assert.equal(document.getElementById("Submit").disabled, false);
             start();
-            var event = document.createEvent("MouseEvents");
-            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1]);
-            document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1].dispatchEvent(event);
-        }, 4000);
+        }, 1500);
+
+    });
+
+    QUnit.test("Widget method: query(), new query after existen query", function (assert){
+        expect(5);
+        stop();
+        ctl1.query("Arg");
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Argentina/Buenos_Aires");
+            assert.equal(document.getElementById("Submit").disabled, true);
+            start();
+        }, 500);
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 0);
+            ctl1.query("B");
+        }, 1000);
+
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Baghdad");
             start();
-        }, 5000);
+        }, 1500);
+
     });
 
     QUnit.test("Widgt method: moveItem, positive num", function (assert){
-        expect(5);
+        expect(3);
         ctl1.query("A");
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
             start();
             ctl1.moveItem(1);
-        }, 1000);
+        }, 500);
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[1].className.indexOf("HightLight") >= 0);
             start();
-        }, 2000);
+        }, 1000);
 
     });
 
@@ -106,14 +133,14 @@ var init = function(){
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
             start();
             ctl1.moveItem(document.getElementsByClassName("CLD_AC_PromptItem").length - 1);
-        }, 1000);
+        }, 500);
 
         stop();
         setTimeout(function() {
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[document.getElementsByClassName("CLD_AC_PromptItem").length - 1].className.indexOf("HightLight") >= 0);
             start();
-        }, 2000);
+        }, 1000);
 
     });
         
@@ -126,14 +153,14 @@ var init = function(){
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
             start();
             ctl1.moveItem(-2);
-        }, 1000);
+        }, 500);
 
         stop();
         setTimeout(function() {
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[document.getElementsByClassName("CLD_AC_PromptItem").length - 2].className.indexOf("HightLight") >= 0);
             start();
-        }, 2000);
+        }, 1000);
     });
 
     QUnit.test("Widgt method: moveItem(), number over length", function (assert){
@@ -145,66 +172,154 @@ var init = function(){
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") >= 0);
             start();
             ctl1.moveItem(document.getElementsByClassName("CLD_AC_PromptItem").length * 2 + 2);
-        }, 1000);
+        }, 500);
 
         stop();
         setTimeout(function() {
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[0].className.indexOf("HightLight") < 0);
             assert.ok(document.getElementsByClassName("CLD_AC_PromptItem")[2].className.indexOf("HightLight") >= 0);
             start();
-        }, 2000);
+        }, 1000);
     });
 
-    QUnit.test("Widget method: checkItem()", function (assert){
+    QUnit.test("Widget method: checkItem(), check twice", function (assert){
         expect(3);
         ctl1.query("A");
 
         stop();
         setTimeout(function() {
-            ctl1.checkItem(0);
+            ctl1.checkItem(ctl1.getSelectedIndex());
             ctl1.query("B");
         }, 1000);
 
         setTimeout(function() {
-            ctl1.checkItem(0);
+            ctl1.checkItem(ctl1.getSelectedIndex());
         }, 2000);
 
         setTimeout(function() {
             assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 2);
             assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Abidjan");
-            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[1].childNodes[0].data, "Bamako");
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[1].childNodes[0].data, "Baghdad");
             start();
         }, 3000);
     });
 
-    QUnit.test("Widget method: unCheckItem()", function (assert){
-        expect(3);
+    QUnit.test("Widget method: checkItem(), check non-existen item", function (assert){
+        expect(1);
         ctl1.query("A");
 
         stop();
         setTimeout(function() {
-            ctl1.checkItem(0);
+            try {
+                ctl1.checkItem(1000);
+            } catch (exp) {
+                assert.equal(exp.message, "node is undefined");
+            }
+            start();
+        }, 500);
+    });
+
+    QUnit.test("Widget method: unCheckItem(), checked two items and uncheck first one twice", function (assert){
+        expect(4);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(ctl1.getSelectedIndex());
             ctl1.query("B");
-        }, 1000);
+        }, 500);
 
         setTimeout(function() {
-            ctl1.checkItem(0);
-        }, 2000);
+            ctl1.checkItem(ctl1.getSelectedIndex());
+        }, 1000);
 
         setTimeout(function() {
             assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 2);
             start();
-        }, 3000);
+        }, 1500);
 
         stop();
         setTimeout(function() {
             ctl1.unCheckItem(0);
-        }, 4000);
+        }, 2000);
         setTimeout(function() {
             assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
-            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Bamako");
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Baghdad");
             start();
-        }, 5000);
+        }, 2500);
+
+        stop();
+        setTimeout(function() {
+            ctl1.unCheckItem(0);
+        }, 3000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 0);
+            start();
+        }, 3500);
+    });
+
+
+    QUnit.test("Widget method: unCheckItem(), checked two items and uncheck 1st then 2nd", function (assert){
+        expect(6);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            ctl1.checkItem(ctl1.getSelectedIndex());
+            ctl1.query("B");
+        }, 500);
+
+        setTimeout(function() {
+            ctl1.checkItem(ctl1.getSelectedIndex());
+        }, 1000);
+
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 2);
+            start();
+        }, 1500);
+
+        stop();
+        setTimeout(function() {
+            ctl1.unCheckItem(0);
+        }, 2000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Baghdad");
+            start();
+        }, 2500);
+
+        stop();
+        setTimeout(function() {
+            try {
+                ctl1.unCheckItem(1);
+            } catch (exp) {
+                assert.equal(exp.message, "node is undefined");
+                assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+                assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Baghdad");
+            }
+            start();
+        }, 2000);
+    });
+
+    QUnit.test("Widget method: getSelectedIndex()", function (assert){
+        expect(2);
+        ctl1.query("A");
+
+        stop();
+        setTimeout(function() {
+            assert.equal(ctl1.getSelectedIndex(), 0);
+            start()
+        }, 500);
+
+        stop();
+        setTimeout(function() {
+            ctl1.query("B");
+        }, 1000);
+
+        setTimeout(function() {
+            assert.equal(ctl1.getSelectedIndex(), 43);
+            start();
+        }, 1500);
     });
 
     QUnit.test("Widget method: getCheckedItems()", function (assert){
@@ -213,32 +328,32 @@ var init = function(){
 
         stop();
         setTimeout(function() {
-            ctl1.checkItem(0);
+            ctl1.checkItem(ctl1.getSelectedIndex());
             ctl1.query("B");
-        }, 1000);
+        }, 500);
 
         setTimeout(function() {
-            ctl1.checkItem(0);
-        }, 2000);
+            ctl1.checkItem(ctl1.getSelectedIndex());
+        }, 1000);
 
         setTimeout(function() {
             var result = ctl1.getCheckedItems();
             assert.equal(result.length, 2);
             assert.equal(result[0].city, "Abidjan");
-            assert.equal(result[1].city, "Bamako");
+            assert.equal(result[1].city, "Baghdad");
             start();
-        }, 3000);
+        }, 1500);
 
         stop();
         setTimeout(function() {
             ctl1.unCheckItem(0);
-        }, 4000);
+        }, 2000);
         setTimeout(function() {
             var result = ctl1.getCheckedItems();
             assert.equal(result.length, 1);
-            assert.equal(result[0].city, "Bamako");
+            assert.equal(result[0].city, "Baghdad");
             start();
-        }, 5000);
+        }, 2500);
     });
 
     QUnit.test("Widget method: getCheckedString()", function (assert){
@@ -247,52 +362,52 @@ var init = function(){
 
         stop();
         setTimeout(function() {
-            ctl1.checkItem(0);
-        }, 1000);
+            ctl1.checkItem(ctl1.getSelectedIndex());
+        }, 500);
 
         setTimeout(function() {
             ctl1.query("B");
-        }, 2000);
+        }, 1000);
 
         setTimeout(function() {
-            ctl1.checkItem(0);
-        }, 3000);
+            ctl1.checkItem(ctl1.getSelectedIndex());
+        }, 1500);
 
         setTimeout(function() {
-            assert.equal(ctl1.getCheckedString(), "Abidjan,Bamako");
+            assert.equal(ctl1.getCheckedString(), "Abidjan,Baghdad");
             start();
-        }, 5000);
+        }, 2000);
 
         stop();
         setTimeout(function() {
             ctl1.unCheckItem(0);
-        }, 6000);
+        }, 2500);
         setTimeout(function() {
-            assert.equal(ctl1.getCheckedString(), "Bamako");
+            assert.equal(ctl1.getCheckedString(), "Baghdad");
             start();
-        }, 7000);
+        }, 3000);
     });
 
-    QUnit.test("Widget method: reConfigure()", function (assert){
+    QUnit.test("Widget method: reConfigure(), modify caseSensitive setup", function (assert){
         expect(2);
         ctl1.query("a");
 
         stop();
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 43);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
             start();
-        }, 1000);
+        }, 500);
 
         stop();
         setTimeout(function() {
             ctl1.reConfigure({caseSensitive: true});
             ctl1.query("a");
-        }, 2000);
+        }, 1500);
 
         setTimeout(function() {
-            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem").length, 0);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 0);
             start();
-        }, 3000);
+        }, 2000);
     });
 
     QUnit.test("Widget method: destroyer()", function (assert){
@@ -305,6 +420,109 @@ var init = function(){
         var ctx1 = CLD.AutoComplete(document.getElementById("PRE_TEST"), conf);
         assert.notDeepEqual(ctl1, ctx1);
         ctl1 = ctx1;
+    });
+
+    QUnit.test("Widget event: mouseup", function (assert){
+        expect(4);
+        ctl1.query("A");
+        stop();
+        setTimeout(function() {
+            start();
+            var event = document.createEvent("MouseEvents");
+            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                document.getElementsByClassName("CLD_AC_PromptItem")[0]);
+            document.getElementsByClassName("CLD_AC_PromptItem")[0].dispatchEvent(event);
+            ctl1.query("");
+        }, 500);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Abidjan");
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptBox")[0].style.display, "none");
+            start();
+            var event = document.createEvent("MouseEvents");
+            event.initMouseEvent('mouseup', true, true, window, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1]);
+            document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[1].dispatchEvent(event);
+        }, 1000);
+
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 0);
+            start();
+        }, 1500);
+    });
+
+    QUnit.test("Widget event: keydown, up, down, and enter", function (assert){
+        expect(12);
+        ctl1.query("A");
+        stop();
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Abidjan");
+            start();
+        }, 500);
+
+        stop();
+        setTimeout(function() {
+            var event = document.createEvent("KeyboardEvent");
+            event.initKeyEvent('keydown', true, true, null, 0, 0, 0, 0, 40, 0);
+            document.getElementsByClassName("CLD_AC_InputBox")[0].dispatchEvent(event);
+        }, 1000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Accra");
+            start();
+        }, 1500);
+
+        stop();
+        setTimeout(function() {
+            var event = document.createEvent("KeyboardEvent");
+            event.initKeyEvent('keydown', true, true, null, 0, 0, 0, 0, 38, 0);
+            document.getElementsByClassName("CLD_AC_InputBox")[0].dispatchEvent(event);
+        }, 2000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Abidjan");
+            start();
+        }, 2500);
+
+        stop();
+        setTimeout(function() {
+            var event = document.createEvent("KeyboardEvent");
+            event.initKeyEvent('keydown', true, true, null, 0, 0, 0, 0, 38, 0);
+            document.getElementsByClassName("CLD_AC_InputBox")[0].dispatchEvent(event);
+        }, 3000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Zurich");
+            start();
+        }, 3500);
+
+        stop();
+        setTimeout(function() {
+            var event = document.createEvent("KeyboardEvent");
+            event.initKeyEvent('keydown', true, true, null, 0, 0, 0, 0, 40, 0);
+            document.getElementsByClassName("CLD_AC_InputBox")[0].dispatchEvent(event);
+        }, 4000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_PromptItem HightLight")[0].innerHTML, "Abidjan");
+            start();
+        }, 4500);
+
+        stop();
+        setTimeout(function() {
+            var event = document.createEvent("KeyboardEvent");
+            event.initKeyEvent('keydown', true, true, null, 0, 0, 0, 0, 13, 0);
+            document.getElementsByClassName("CLD_AC_InputBox")[0].dispatchEvent(event);
+        }, 5000);
+        setTimeout(function() {
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked").length, 1);
+            assert.equal(document.getElementsByClassName("CLD_AC_Checked")[0].childNodes[0].data, "Abidjan");
+            start();
+        }, 5500);
     });
 
     QUnit.module( "Multiple entries", {

@@ -2,7 +2,7 @@ var CLD = (function(){
     // a register is {node, type, context}  
     var widgetRegister = [];
 
-    var toggleString = function(str, s, delimiter) {
+    function toggleString(str, s, delimiter) {
         var list = str.split(delimiter);
         if (list.length === 1 && list[0] === "") {
             list[0] = s;
@@ -16,13 +16,15 @@ var CLD = (function(){
             }
         }
         return list.join(delimiter);
-    };
+    }
     return {
         widgetRegister: widgetRegister,
         findWidget: function(node, type) {
             for (var i = 0; i < widgetRegister.length; i++) {
                 var reg = widgetRegister[i];
-                if (reg.node && reg.node === node && reg.type && reg.type === type && reg.context) {
+                if (reg.node && reg.node === node &&
+                    reg.type && reg.type === type &&
+                    reg.context) {
                     return reg.context;
                 }
             }
@@ -104,13 +106,14 @@ CLD.AutoComplete = function(origNode, conf) {
         moveItem: moveItem,
         checkItem: checkItem,
         unCheckItem: unCheckItem,
+        getSelectedIndex: getSelectedIndex,
         getCheckedItems: getCheckedItems,
         getCheckedString: getCheckedString,
         reConfigure: configure,
         destroyer: destroyer,
     };
     CLD.registerWidget(origNode, WIDGET_NAME, ACController);
-    inputBox.addEventListener("keydown", keyDownHandler, false);
+    frameBox.addEventListener("keydown", keyDownHandler, false);
     frameBox.addEventListener("input", inputHandler, false);
 
     return ACController;
@@ -129,6 +132,7 @@ CLD.AutoComplete = function(origNode, conf) {
         conf.submitCallback = config.submitCallback || conf.submitCallback || {lock: null, unLock: null};
         conf.caseSensitive = config.caseSensitive || conf.caseSensitive || false;
         conf.dataObj = config.dataObj || conf.dataObj || {};
+        conf.dataObj.sort(function (v1, v2) { return v1[conf.key] > v2[conf.key];});
 
         initDOM(origNode);
     }
@@ -142,11 +146,20 @@ CLD.AutoComplete = function(origNode, conf) {
         inputBox.className = conf.inputBoxClassName;
 
         checkedBox = document.createElement("span");
-        checkedBox.className = conf.inputBoxClassName;
+        checkedBox.className = conf.checkedBoxClassName;
 
         promptBox = document.createElement("div");
         promptBox.className = conf.promptBoxClassName;
         promptBox.style.display = "None";
+        conf.dataObj.forEach(function findMatch(val, idx, arr) {
+            var tmpNode = document.createElement("div");
+            tmpNode.innerHTML = val[conf.key];
+            tmpNode.dataIndex = idx;    //Customize attribute
+            tmpNode.className = conf.promptItemClassName;
+            tmpNode.addEventListener("mouseover", itemMouseOverHandler ,false);
+            tmpNode.addEventListener("mouseup", itemMouseUpHandler ,false);
+            promptBox.appendChild(tmpNode);
+        });
 
         frameBox = document.createElement("span");
         frameBox.className = conf.frameBoxClassName;
@@ -217,81 +230,62 @@ CLD.AutoComplete = function(origNode, conf) {
         return node;
     }
 
+    function indexOfCase(str1, str2, caseSensitive) {
+        if (!caseSensitive) {
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+        }
+        return str1.indexOf(str2);
+    }
+
     function query(queryStr) {
         var i;
         inputBox.value = queryStr;
+        lowLightItem(promptBox.childNodes[currSelected]);
         if (!queryStr) {
+            if (conf.submitCallback.unLock instanceof Function) {
+                conf.submitCallback.unLock();
+            }
+            currSelected = 0;
             showPromptBox(false);
             return;
         }
+
         if (conf.submitCallback.lock instanceof Function) {
             conf.submitCallback.lock();
         }
-        //A new query or from "ABC" into "CDE", clean current result
+
+        //A new query or different prefix of previous query
         if (!oldQueryStr || queryStr.indexOf(oldQueryStr) !== 0) {
-            while (promptBox.firstChild) {
-                promptBox.removeChild(promptBox.firstChild);
-            }
-            filteredItems = [];
-            conf.dataObj.forEach(function findMatch(val, idx, arr) {
-                var v = val[conf.key];
-                var s = queryStr;
-                if (!conf.caseSensitive) {
-                    v = v.toLowerCase();
-                    s = s.toLowerCase();
-                }
-                if (v.indexOf(s) === 0) {
-                    filteredItems.push(arr[idx]);
-                    var tmpNode = document.createElement("div");
-                    tmpNode.innerHTML = val[conf.key];
-                    tmpNode.className = conf.promptItemClassName;
-                    tmpNode.dataObj = val;
-                    tmpNode.addEventListener("mouseover", itemMouseOverHandler ,false);
-                    tmpNode.addEventListener("mouseup", itemMouseUpHandler ,false);
-                    promptBox.appendChild(tmpNode);
-                }
-            });
-        } else {
-            for(i = filteredItems.length - 1; i >= 0; i--) {
-                var v = filteredItems[i][conf.key];
-                var s = queryStr;
-                if (!conf.caseSensitive) {
-                    v = v.toLowerCase();
-                    s = s.toLowerCase();
-                }
-                if (v.indexOf(s) !== 0) {
-                    filteredItems.splice(i, 1);
-                    promptBox.removeChild(promptBox.childNodes[i]);
-                }
+            currSelected = 0;
+        }
+
+        for (i = currSelected; i < conf.dataObj.length; i++) {
+            if (indexOfCase(conf.dataObj[i][conf.key], queryStr, conf.caseSensitive) === 0) {
+                currSelected = i;
+                showPromptBox(true);
+                hightLightItem(promptBox.childNodes[i], true);
+                break;
             }
         }
         oldQueryStr = queryStr;
 
-        if (filteredItems.length > 0) {
-            showPromptBox(true);
-            currSelected = 0;
-            hightLightItem(promptBox.childNodes[currSelected]);
-        } else {
-            showPromptBox(false);
-        }
-
-        return filteredItems;
+        return;
     }
 
     function moveItem(inc) {
         lowLightItem(promptBox.childNodes[currSelected]);
-        currSelected = (filteredItems.length + (currSelected + inc)) % filteredItems.length;
+        currSelected = (conf.dataObj.length + (currSelected + inc)) % conf.dataObj.length;
         hightLightItem(promptBox.childNodes[currSelected]);
     }
 
     function checkItem(node) {
-        //This function seem cost much.
         node = tryIndex2Node(promptBox, node);
         CLD.toggleInputValue(origNode, node.innerHTML, conf.delimiter);
         var tmpNode = document.createElement("span");
         var tmpImgNode = document.createElement("a");
 
-        checkedItems.push(node.dataObj);
+        checkedItems.push(conf.dataObj[node.dataIndex]);
         tmpNode.className = conf.checkedClassName;
         tmpNode.innerHTML = node.innerHTML;
         tmpNode.checkedIdx = checkedItems.length - 1;
@@ -300,7 +294,6 @@ CLD.AutoComplete = function(origNode, conf) {
         tmpNode.appendChild(tmpImgNode);
         checkedBox.appendChild(tmpNode);
         //frameBox.insertBefore(tmpNode, inputBox);
-
         
         // This is simliar to multiple check.
         //showPromptBox(true);
@@ -317,6 +310,10 @@ CLD.AutoComplete = function(origNode, conf) {
         checkedItems.splice(node.checkedIdx, 1);
         CLD.toggleInputValue(origNode, node.childNodes[0].textContent, conf.delimiter);
         checkedBox.removeChild(node);
+    }
+
+    function getSelectedIndex () {
+        return currSelected;
     }
 
     function getCheckedItems() {
